@@ -1,0 +1,1354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FinGuard AI — Autonomous Financial Intelligence Platform</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛡️</text></svg>" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://cdn.plot.ly/plotly-2.32.0.min.js"></script>
+
+  <style>
+    :root {
+      --bg-dark: #070B14;
+      --bg-surface: rgba(15, 23, 42, 0.75);
+      --bg-card: rgba(30, 41, 59, 0.55);
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --border-highlight: rgba(0, 210, 255, 0.35);
+      --primary: #00D2FF;
+      --primary-gradient: linear-gradient(135deg, #00D2FF 0%, #7000FF 100%);
+      --accent-green: #10B981;
+      --accent-red: #EF4444;
+      --accent-amber: #F59E0B;
+      --text-main: #F8FAFC;
+      --text-muted: #94A3B8;
+      --text-dim: #64748B;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    body {
+      background: radial-gradient(circle at 10% 10%, #0F172A 0%, #070B14 100%);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      overflow-x: hidden;
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); }
+    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
+
+    /* Layout */
+    .sidebar {
+      width: 280px;
+      min-height: 100vh;
+      background: rgba(10, 15, 29, 0.85);
+      backdrop-filter: blur(20px);
+      border-right: 1px solid var(--border-subtle);
+      padding: 24px 16px;
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      z-index: 100;
+      overflow-y: auto;
+    }
+
+    .main-content {
+      margin-left: 280px;
+      flex: 1;
+      padding: 32px 40px;
+      max-width: 1400px;
+      width: calc(100% - 280px);
+    }
+
+    /* Brand Header */
+    .brand-box {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 24px;
+      padding-bottom: 18px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    .brand-icon {
+      font-size: 2rem;
+      filter: drop-shadow(0 0 12px rgba(0,210,255,0.4));
+    }
+    .brand-title {
+      font-size: 1.35rem;
+      font-weight: 800;
+      background: var(--primary-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: -0.5px;
+    }
+    .brand-tag {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    /* User Pill */
+    .user-pill {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 24px;
+    }
+    .user-pill-title {
+      font-size: 0.68rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+    .user-pill-name {
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: #fff;
+      margin: 3px 0;
+    }
+    .user-pill-email {
+      font-size: 0.75rem;
+      color: var(--primary);
+    }
+
+    /* Navigation */
+    .nav-group-title {
+      font-size: 0.68rem;
+      font-weight: 700;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin: 18px 8px 8px 8px;
+    }
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      border-radius: 10px;
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      margin-bottom: 3px;
+    }
+    .nav-item:hover {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.05);
+    }
+    .nav-item.active {
+      color: #fff;
+      background: linear-gradient(90deg, rgba(0, 210, 255, 0.18) 0%, rgba(112, 0, 255, 0.12) 100%);
+      border-left: 3px solid var(--primary);
+    }
+
+    /* Hero Banner */
+    .hero-header {
+      font-size: 2.1rem;
+      font-weight: 800;
+      background: var(--primary-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: -0.5px;
+      margin-bottom: 6px;
+    }
+    .hero-sub {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      margin-bottom: 28px;
+    }
+
+    /* KPI Cards Grid */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+    .kpi-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 16px;
+      padding: 18px;
+      backdrop-filter: blur(16px);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+      transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+    .kpi-card:hover {
+      transform: translateY(-2px);
+      border-color: var(--border-highlight);
+    }
+    .kpi-label {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .kpi-val {
+      font-size: 1.6rem;
+      font-weight: 800;
+      margin: 6px 0;
+      color: #fff;
+    }
+    .kpi-badge {
+      display: inline-block;
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 20px;
+    }
+    .badge-pos { background: rgba(16, 185, 129, 0.15); color: var(--accent-green); border: 1px solid rgba(16, 185, 129, 0.3); }
+    .badge-neg { background: rgba(239, 68, 68, 0.15); color: var(--accent-red); border: 1px solid rgba(239, 68, 68, 0.3); }
+    .badge-amber { background: rgba(245, 158, 11, 0.15); color: var(--accent-amber); border: 1px solid rgba(245, 158, 11, 0.3); }
+    .badge-cyan { background: rgba(0, 210, 255, 0.15); color: var(--primary); border: 1px solid rgba(0, 210, 255, 0.3); }
+
+    /* Sections */
+    .page-section {
+      display: none;
+    }
+    .page-section.active {
+      display: block;
+      animation: fadeIn 0.3s ease;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Cards & Containers */
+    .content-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 24px;
+      backdrop-filter: blur(16px);
+    }
+    .box-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    /* Grid Layouts */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    /* Tables */
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.88rem;
+    }
+    .data-table th {
+      text-align: left;
+      padding: 12px 14px;
+      background: rgba(255, 255, 255, 0.03);
+      color: var(--text-muted);
+      font-weight: 700;
+      border-bottom: 1px solid var(--border-subtle);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+    }
+    .data-table td {
+      padding: 12px 14px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      color: #CBD5E1;
+    }
+    .data-table tr:hover td {
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    /* Forms & Inputs */
+    .input-field {
+      width: 100%;
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      padding: 10px 14px;
+      color: #fff;
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .input-field:focus {
+      border-color: var(--primary);
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 0.88rem;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s ease;
+      text-decoration: none;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, #00D2FF 0%, #0077FF 100%);
+      color: #000;
+    }
+    .btn-primary:hover {
+      box-shadow: 0 0 16px rgba(0,210,255,0.4);
+      transform: translateY(-1px);
+    }
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.08);
+      color: #fff;
+      border: 1px solid var(--border-subtle);
+    }
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.12);
+    }
+
+    /* X-Ray Cards */
+    .xray-card {
+      background: rgba(255, 255, 255, 0.02);
+      border-left: 4px solid var(--primary);
+      border-radius: 0 12px 12px 0;
+      padding: 16px 20px;
+      margin-bottom: 14px;
+    }
+    .xray-danger { border-left-color: var(--accent-red); background: rgba(239, 68, 68, 0.04); }
+    .xray-warning { border-left-color: var(--accent-amber); background: rgba(245, 158, 11, 0.04); }
+    .xray-success { border-left-color: var(--accent-green); background: rgba(16, 185, 129, 0.04); }
+
+    /* Chat Messages */
+    .chat-box {
+      height: 380px;
+      overflow-y: auto;
+      padding: 16px;
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      background: rgba(10, 15, 30, 0.6);
+      margin-bottom: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .chat-msg {
+      max-width: 80%;
+      padding: 12px 16px;
+      border-radius: 12px;
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+    .msg-user {
+      align-self: flex-end;
+      background: linear-gradient(135deg, #0077FF, #7000FF);
+      color: #fff;
+    }
+    .msg-bot {
+      align-self: flex-start;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--border-subtle);
+      color: #E2E8F0;
+    }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      .sidebar { width: 80px; padding: 16px 8px; }
+      .brand-title, .brand-tag, .user-pill, .nav-group-title, .nav-text { display: none; }
+      .main-content { margin-left: 80px; width: calc(100% - 80px); padding: 20px; }
+      .grid-2, .grid-3 { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="brand-box">
+      <div class="brand-icon">🛡️</div>
+      <div>
+        <div class="brand-title">FinGuard AI</div>
+        <div class="brand-tag">Risk & Intelligence</div>
+      </div>
+    </div>
+
+    <div class="user-pill">
+      <div class="user-pill-title">Active Account</div>
+      <div class="user-pill-name">👤 Alex Morgan</div>
+      <div class="user-pill-email">alex.morgan@fintech.ai</div>
+    </div>
+
+    <div class="nav-group-title">Command Center</div>
+    <a class="nav-item active" onclick="showPage('dashboard', this)"><span>🏠</span><span class="nav-text">Dashboard</span></a>
+
+    <div class="nav-group-title">Money</div>
+    <a class="nav-item" onclick="showPage('transactions', this)"><span>💳</span><span class="nav-text">Transactions</span></a>
+    <a class="nav-item" onclick="showPage('accounts', this)"><span>🏦</span><span class="nav-text">Accounts</span></a>
+    <a class="nav-item" onclick="showPage('expense-intelligence', this)"><span>📊</span><span class="nav-text">Expense Intelligence</span></a>
+    <a class="nav-item" onclick="showPage('budgets', this)"><span>💰</span><span class="nav-text">Budgets & Goals</span></a>
+
+    <div class="nav-group-title">Financial Health</div>
+    <a class="nav-item" onclick="showPage('risk-center', this)"><span>⚠️</span><span class="nav-text">Risk Center & X-Ray</span></a>
+    <a class="nav-item" onclick="showPage('risk-dna', this)"><span>🧬</span><span class="nav-text">Risk DNA Radar</span></a>
+    <a class="nav-item" onclick="showPage('forecasting', this)"><span>🔮</span><span class="nav-text">Forecasting</span></a>
+
+    <div class="nav-group-title">Decision Tools</div>
+    <a class="nav-item" onclick="showPage('decision-tools', this)"><span>💡</span><span class="nav-text">Can I Afford This?</span></a>
+    <a class="nav-item" onclick="showPage('stress-test', this)"><span>⚡</span><span class="nav-text">Stress Simulator</span></a>
+
+    <div class="nav-group-title">Investments & AI</div>
+    <a class="nav-item" onclick="showPage('stock-ai', this)"><span>📈</span><span class="nav-text">Stock AI Analyzer</span></a>
+    <a class="nav-item" onclick="showPage('ask-ai', this)"><span>🤖</span><span class="nav-text">Ask FinGuard AI</span></a>
+
+    <div style="margin-top: auto; padding-top: 20px;">
+      <a href="https://github.com/Neelkore25/Finguard-ai" target="_blank" class="btn btn-secondary" style="width: 100%; font-size: 0.78rem;">
+        ⭐ Star on GitHub
+      </a>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="main-content">
+
+    <!-- PAGE 1: DASHBOARD -->
+    <section id="page-dashboard" class="page-section active">
+      <div class="hero-header">Financial Command Center</div>
+      <div class="hero-sub">Autonomous telemetry, 0–100 mathematical risk evaluation, and real-time cash flow diagnostics.</div>
+
+      <!-- 6 CORE KPIS -->
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-label">💎 Net Worth</div>
+          <div class="kpi-val" id="kpi-net-worth">₹5,85,000</div>
+          <span class="kpi-badge badge-pos">Assets − Debt</span>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">💵 Monthly Inflow</div>
+          <div class="kpi-val" id="kpi-income">₹1,25,000</div>
+          <span class="kpi-badge badge-pos">Salary Verified</span>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">💳 Monthly Outflow</div>
+          <div class="kpi-val" id="kpi-expense">₹78,200</div>
+          <span class="kpi-badge badge-neg">Burn: ₹2,606/d</span>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">💰 Savings Rate</div>
+          <div class="kpi-val" id="kpi-savings-rate">37.4%</div>
+          <span class="kpi-badge badge-pos">Target: &gt;25%</span>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">🛡️ Risk Score</div>
+          <div class="kpi-val" id="kpi-risk-score" style="color: var(--accent-amber);">38 <span style="font-size: 0.8rem; color:#94A3B8;">/100</span></div>
+          <span class="kpi-badge badge-amber">Moderate Risk</span>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">⏳ Emergency Buffer</div>
+          <div class="kpi-val" id="kpi-runway">3.6 <span style="font-size: 0.8rem; color:#94A3B8;">Mo</span></div>
+          <span class="kpi-badge badge-cyan">Liquid Reserve</span>
+        </div>
+      </div>
+
+      <!-- CHARTS ROW -->
+      <div class="grid-2">
+        <div class="content-box">
+          <div class="box-title">📊 Cash Flow Trajectory (Income vs Expenses)</div>
+          <div id="chart-cashflow" style="height: 320px;"></div>
+        </div>
+        <div class="content-box">
+          <div class="box-title">🥧 Categorical Spend Distribution</div>
+          <div id="chart-category" style="height: 320px;"></div>
+        </div>
+      </div>
+
+      <!-- QUICK ADD TRANSACTION -->
+      <div class="content-box">
+        <div class="box-title">➕ Quick Log Transaction (Updates Telemetry Real-time)</div>
+        <form id="quick-tx-form" onsubmit="handleQuickAddTx(event)" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)) 120px; gap: 12px; align-items: end;">
+          <div>
+            <label style="font-size: 0.75rem; color: var(--text-muted);">Date</label>
+            <input type="date" id="tx-date" class="input-field" required />
+          </div>
+          <div>
+            <label style="font-size: 0.75rem; color: var(--text-muted);">Type</label>
+            <select id="tx-type" class="input-field">
+              <option value="Expense">Expense</option>
+              <option value="Income">Income</option>
+            </select>
+          </div>
+          <div>
+            <label style="font-size: 0.75rem; color: var(--text-muted);">Category</label>
+            <select id="tx-cat" class="input-field">
+              <option value="Food">Food</option>
+              <option value="Rent">Rent</option>
+              <option value="Transport">Transport</option>
+              <option value="Shopping">Shopping</option>
+              <option value="Bills">Bills</option>
+              <option value="Salary">Salary</option>
+              <option value="Investments">Investments</option>
+            </select>
+          </div>
+          <div>
+            <label style="font-size: 0.75rem; color: var(--text-muted);">Amount (₹)</label>
+            <input type="number" id="tx-amt" class="input-field" min="1" value="1250" required />
+          </div>
+          <div>
+            <label style="font-size: 0.75rem; color: var(--text-muted);">Description</label>
+            <input type="text" id="tx-desc" class="input-field" value="Dining Out" required />
+          </div>
+          <button type="submit" class="btn btn-primary" style="height: 42px;">Save</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- PAGE 2: TRANSACTIONS -->
+    <section id="page-transactions" class="page-section">
+      <div class="hero-header">Transaction Hub & CSV Ingestion</div>
+      <div class="hero-sub">Audit-grade ledger with automated search, category filtering, and statement ingestion.</div>
+
+      <div class="content-box">
+        <div style="display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 20px;">
+          <input type="text" id="tx-search" class="input-field" placeholder="🔍 Search description or vendor..." oninput="filterTransactions()" style="max-width: 320px;" />
+          <select id="filter-type" class="input-field" onchange="filterTransactions()" style="max-width: 160px;">
+            <option value="All">All Types</option>
+            <option value="Expense">Expense</option>
+            <option value="Income">Income</option>
+          </select>
+          <select id="filter-cat" class="input-field" onchange="filterTransactions()" style="max-width: 180px;">
+            <option value="All">All Categories</option>
+            <option value="Food">Food</option>
+            <option value="Rent">Rent</option>
+            <option value="Bills">Bills</option>
+            <option value="Transport">Transport</option>
+            <option value="Shopping">Shopping</option>
+            <option value="Salary">Salary</option>
+            <option value="Investments">Investments</option>
+          </select>
+          <button class="btn btn-secondary" onclick="exportCSV()">📥 Export CSV</button>
+        </div>
+
+        <div style="overflow-x: auto;">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Type</th>
+                <th>Category</th>
+                <th>Description</th>
+                <th>Account</th>
+                <th>Amount (₹)</th>
+              </tr>
+            </thead>
+            <tbody id="tx-table-body">
+              <!-- Rendered dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- PAGE 3: ACCOUNTS -->
+    <section id="page-accounts" class="page-section">
+      <div class="hero-header">Financial Accounts & Liquidity Balances</div>
+      <div class="hero-sub">Multi-account telemetry monitoring checking, savings, credit cards, and cash.</div>
+
+      <div class="grid-3" style="margin-bottom: 24px;">
+        <div class="kpi-card">
+          <div class="kpi-label">🏦 HDFC Salary A/c</div>
+          <div class="kpi-val" style="color: var(--accent-green);">₹3,42,500</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted);">Primary checking & inflow account</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">💳 Regalia Credit Card</div>
+          <div class="kpi-val" style="color: var(--accent-red);">-₹38,500</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted);">Revolving credit balance (Due 15th)</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">🏛️ High-Yield Emergency FD</div>
+          <div class="kpi-val" style="color: var(--primary);">₹2,81,000</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted);">Sweep-in reserve buffer (7.1% p.a.)</div>
+        </div>
+      </div>
+
+      <div class="content-box">
+        <div class="box-title">Account Liquidity Distribution</div>
+        <div id="chart-accounts" style="height: 320px;"></div>
+      </div>
+    </section>
+
+    <!-- PAGE 4: EXPENSE INTELLIGENCE -->
+    <section id="page-expense-intelligence" class="page-section">
+      <div class="hero-header">Expense Intelligence & Behavioral Analytics</div>
+      <div class="hero-sub">Algorithmic spending pattern decomposition and weekend vs weekday surge analytics.</div>
+
+      <div class="grid-3" style="margin-bottom: 24px;">
+        <div class="kpi-card">
+          <div class="kpi-label">👑 Top Spend Category</div>
+          <div class="kpi-val">Dining & Food</div>
+          <span class="kpi-badge badge-neg">22.4% of Outflow</span>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">🗓️ Weekday Avg Burn</div>
+          <div class="kpi-val">₹1,940</div>
+          <span class="kpi-badge badge-pos">Monday — Friday</span>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">🎉 Weekend Surge Multiplier</div>
+          <div class="kpi-val" style="color: var(--accent-amber);">+34.2%</div>
+          <span class="kpi-badge badge-amber">Sat & Sun Dining Spike</span>
+        </div>
+      </div>
+
+      <div class="content-box">
+        <div class="box-title">Monthly Spending Trajectory & Moving Average</div>
+        <div id="chart-expense-intel" style="height: 340px;"></div>
+      </div>
+    </section>
+
+    <!-- PAGE 5: RISK CENTER & X-RAY -->
+    <section id="page-risk-center" class="page-section">
+      <div class="hero-header">Financial Risk Center & Structural X-Ray</div>
+      <div class="hero-sub">Audited 0–100 mathematical risk engine and early vulnerability detection.</div>
+
+      <div class="grid-2" style="margin-bottom: 24px;">
+        <div class="content-box">
+          <div class="box-title">Financial Risk Gauge</div>
+          <div id="chart-risk-gauge" style="height: 260px;"></div>
+          <div style="text-align: center; color: var(--text-muted); font-size: 0.88rem; margin-top: 10px;">
+            Evaluation: <strong>Moderate Risk (38/100)</strong>. Sound income foundation offset by credit card revolving debt.
+          </div>
+        </div>
+
+        <div class="content-box">
+          <div class="box-title">Mathematical Factor Breakdown</div>
+          <div style="display: flex; flex-direction: column; gap: 14px;">
+            <div>
+              <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 4px;">
+                <span>Savings Rate Performance</span>
+                <span style="font-weight: 700; color: var(--accent-green);">8 / 25 pts</span>
+              </div>
+              <div style="height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; overflow: hidden;">
+                <div style="width: 32%; height: 100%; background: var(--accent-green);"></div>
+              </div>
+            </div>
+            <div>
+              <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 4px;">
+                <span>Debt-to-Income (DTI) Ratio</span>
+                <span style="font-weight: 700; color: var(--accent-green);">8 / 25 pts</span>
+              </div>
+              <div style="height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; overflow: hidden;">
+                <div style="width: 32%; height: 100%; background: var(--accent-green);"></div>
+              </div>
+            </div>
+            <div>
+              <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 4px;">
+                <span>Emergency Buffer Reserve</span>
+                <span style="font-weight: 700; color: var(--accent-amber);">7 / 20 pts</span>
+              </div>
+              <div style="height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; overflow: hidden;">
+                <div style="width: 35%; height: 100%; background: var(--accent-amber);"></div>
+              </div>
+            </div>
+            <div>
+              <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 4px;">
+                <span>Expense Volatility & Spikes</span>
+                <span style="font-weight: 700; color: var(--accent-amber);">6 / 15 pts</span>
+              </div>
+              <div style="height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; overflow: hidden;">
+                <div style="width: 40%; height: 100%; background: var(--accent-amber);"></div>
+              </div>
+            </div>
+            <div>
+              <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 4px;">
+                <span>Fixed / Recurring Commitments</span>
+                <span style="font-weight: 700; color: var(--accent-green);">9 / 15 pts</span>
+              </div>
+              <div style="height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; overflow: hidden;">
+                <div style="width: 60%; height: 100%; background: var(--accent-green);"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="content-box">
+        <div class="box-title">🔬 Financial X-Ray Findings</div>
+        <div class="xray-card xray-warning">
+          <div style="display: flex; justify-content: space-between; font-weight: 700;">
+            <span>Dining & Discretionary Food Concentration</span>
+            <span class="kpi-badge badge-amber">Warning</span>
+          </div>
+          <div style="font-size: 0.88rem; color: #CBD5E1; margin: 4px 0;"><strong>Telemetry Evidence:</strong> Food represents 22.4% of total living expenditure (₹17,500/mo).</div>
+          <div style="font-size: 0.88rem; color: var(--primary);"><strong>Actionable Prescription:</strong> Cap gourmet delivery apps to 1 weekly order to preserve ₹55,000 annually.</div>
+        </div>
+
+        <div class="xray-card xray-danger">
+          <div style="display: flex; justify-content: space-between; font-weight: 700;">
+            <span>Credit Card Revolving Debt Hazard</span>
+            <span class="kpi-badge badge-neg">Danger</span>
+          </div>
+          <div style="font-size: 0.88rem; color: #CBD5E1; margin: 4px 0;"><strong>Telemetry Evidence:</strong> Carrying ₹38,500 revolving balance at 36% APR.</div>
+          <div style="font-size: 0.88rem; color: var(--primary);"><strong>Actionable Prescription:</strong> Initiate debt avalanche repayment to prevent ₹13,800/yr in compounding interest.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PAGE 6: RISK DNA -->
+    <section id="page-risk-dna" class="page-section">
+      <div class="hero-header">Behavioral Risk DNA Radar</div>
+      <div class="hero-sub">6-axis psychometric behavioral profile mapping financial personality.</div>
+
+      <div class="grid-2">
+        <div class="content-box">
+          <div class="box-title">6-Axis Behavioral Persona</div>
+          <div id="chart-radar" style="height: 380px;"></div>
+        </div>
+        <div class="content-box" style="display: flex; flex-direction: column; justify-content: center;">
+          <div class="kpi-label">Persona Classification</div>
+          <div style="font-size: 1.8rem; font-weight: 800; color: var(--primary); margin: 6px 0;">Prudent Wealth Builder</div>
+          <p style="color: #CBD5E1; font-size: 0.95rem; line-height: 1.6; margin-bottom: 20px;">
+            Disciplined saver with steady professional income, structured mutual fund SIPs, but carrying short-term auto loan & revolving credit debt that warrants faster clearance.
+          </p>
+          <div class="kpi-grid" style="grid-template-columns: 1fr 1fr; margin-bottom: 0;">
+            <div class="kpi-card" style="padding: 12px;">
+              <div class="kpi-label">Savings Discipline</div>
+              <div style="font-size: 1.2rem; font-weight: 800; color: var(--accent-green);">88 / 100</div>
+            </div>
+            <div class="kpi-card" style="padding: 12px;">
+              <div class="kpi-label">Debt Restraint</div>
+              <div style="font-size: 1.2rem; font-weight: 800; color: var(--accent-amber);">68 / 100</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PAGE 7: FORECASTING -->
+    <section id="page-forecasting" class="page-section">
+      <div class="hero-header">Predictive Time-Series Forecasting</div>
+      <div class="hero-sub">60-day linear regression cash flow projection and runway exhaustion dates.</div>
+
+      <div class="grid-3" style="margin-bottom: 24px;">
+        <div class="kpi-card">
+          <div class="kpi-label">Projected 30-Day Outflow</div>
+          <div class="kpi-val">₹81,300</div>
+          <span class="kpi-badge badge-amber">+3.9% Variance</span>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Projected Cash Surplus</div>
+          <div class="kpi-val" style="color: var(--accent-green);">₹43,700</div>
+          <span class="kpi-badge badge-pos">Available for SIPs</span>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Runway Exhaustion</div>
+          <div class="kpi-val">None</div>
+          <span class="kpi-badge badge-pos">Resilient Reserves</span>
+        </div>
+      </div>
+
+      <div class="content-box">
+        <div class="box-title">Historical vs 60-Day Projected Outflows</div>
+        <div id="chart-forecast" style="height: 360px;"></div>
+      </div>
+    </section>
+
+    <!-- PAGE 8: DECISION TOOLS -->
+    <section id="page-decision-tools" class="page-section">
+      <div class="hero-header">Can I Afford This? (Decision Engine)</div>
+      <div class="hero-sub">Algorithmic purchase simulator analyzing impact on emergency runway.</div>
+
+      <div class="grid-2">
+        <div class="content-box">
+          <div class="box-title">Simulate Planned Purchase</div>
+          <div style="margin-bottom: 16px;">
+            <label style="font-size: 0.8rem; color: var(--text-muted);">Purchase Item</label>
+            <input type="text" id="afford-item" class="input-field" value="MacBook Pro M3 Max" />
+          </div>
+          <div style="margin-bottom: 20px;">
+            <label style="font-size: 0.8rem; color: var(--text-muted);">Cost (₹)</label>
+            <input type="number" id="afford-cost" class="input-field" value="75000" oninput="calculateAffordability()" />
+          </div>
+          <button class="btn btn-primary" onclick="calculateAffordability()">Evaluate Liquidity Impact</button>
+        </div>
+
+        <div class="content-box">
+          <div class="box-title">Algorithmic Verdict</div>
+          <div id="afford-verdict-box">
+            <span class="kpi-badge badge-pos" style="font-size: 0.9rem; padding: 6px 14px;">LOW FINANCIAL IMPACT</span>
+            <h3 style="margin: 14px 0 6px 0; color: #fff;">✅ Safe to Proceed</h3>
+            <p style="color: #CBD5E1; font-size: 0.92rem; line-height: 1.5;">
+              Liquid runway reduces from <strong>3.6 months</strong> to <strong>2.6 months</strong>. Reserves remain above minimum safe thresholds.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PAGE 9: STRESS TEST -->
+    <section id="page-stress-test" class="page-section">
+      <div class="hero-header">Macro & Emergency Financial Stress Test</div>
+      <div class="hero-sub">Simulate sudden job loss, unexpected medical bills, or cost-of-living inflation.</div>
+
+      <div class="content-box">
+        <div class="grid-3" style="margin-bottom: 24px;">
+          <div>
+            <label style="font-size: 0.85rem; color: var(--text-muted);">Income Shock (% Drop)</label>
+            <input type="range" id="stress-income" min="0" max="100" value="50" step="10" oninput="runStressTest()" style="width: 100%;" />
+            <div style="font-weight: 700; color: var(--accent-red); margin-top: 4px;" id="stress-inc-val">50% Income Loss</div>
+          </div>
+          <div>
+            <label style="font-size: 0.85rem; color: var(--text-muted);">Emergency Medical Outlay (₹)</label>
+            <input type="number" id="stress-lump" class="input-field" value="50000" step="10000" oninput="runStressTest()" />
+          </div>
+          <div>
+            <label style="font-size: 0.85rem; color: var(--text-muted);">Expense Inflation Surge (%)</label>
+            <input type="range" id="stress-inf" min="0" max="50" value="15" step="5" oninput="runStressTest()" style="width: 100%;" />
+            <div style="font-weight: 700; color: var(--accent-amber); margin-top: 4px;" id="stress-inf-val">+15% Living Costs</div>
+          </div>
+        </div>
+
+        <div class="grid-3">
+          <div class="kpi-card">
+            <div class="kpi-label">Stressed Net Deficit</div>
+            <div class="kpi-val" id="stress-deficit" style="color: var(--accent-red);">₹27,430/mo</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">Buffer Post-Emergency</div>
+            <div class="kpi-val" id="stress-post-buffer">₹2,31,000</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">Estimated Survival Window</div>
+            <div class="kpi-val" id="stress-survival" style="color: var(--accent-green);">8.4 Months</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PAGE 10: STOCK AI -->
+    <section id="page-stock-ai" class="page-section">
+      <div class="hero-header">Stock AI & Technical Indicator Engine</div>
+      <div class="hero-sub">NSE/BSE Indian equities analysis, moving averages, RSI 14, and AI outlooks.</div>
+
+      <div style="display: flex; gap: 12px; margin-bottom: 20px;">
+        <button class="btn btn-primary" onclick="loadStock('TCS.NS')">TCS.NS</button>
+        <button class="btn btn-secondary" onclick="loadStock('RELIANCE.NS')">RELIANCE.NS</button>
+        <button class="btn btn-secondary" onclick="loadStock('INFY.NS')">INFY.NS</button>
+        <button class="btn btn-secondary" onclick="loadStock('HDFCBANK.NS')">HDFCBANK.NS</button>
+      </div>
+
+      <div class="grid-3" style="margin-bottom: 24px;">
+        <div class="kpi-card">
+          <div class="kpi-label" id="stock-ticker-label">TCS.NS Price</div>
+          <div class="kpi-val" id="stock-price">₹3,912.45</div>
+          <span class="kpi-badge badge-pos" id="stock-change">+0.70%</span>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">14-Day RSI</div>
+          <div class="kpi-val" id="stock-rsi">52.4</div>
+          <span class="kpi-badge badge-cyan">Neutral Zone</span>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Trailing P/E Ratio</div>
+          <div class="kpi-val" id="stock-pe">29.8</div>
+          <span class="kpi-badge badge-pos">High ROE (51.2%)</span>
+        </div>
+      </div>
+
+      <div class="content-box">
+        <div class="box-title">6-Month Price Action (Candlestick & 20/50 SMA)</div>
+        <div id="chart-stock" style="height: 360px;"></div>
+      </div>
+
+      <div class="content-box">
+        <div class="box-title">🧠 AI Investment Outlook</div>
+        <h4 style="color: var(--primary); margin-bottom: 6px;" id="stock-outlook">Positive Outlook — Accumulate on Dips</h4>
+        <p style="color: #CBD5E1; font-size: 0.92rem; line-height: 1.6;" id="stock-rationale">
+          Resilient industry-leading operating margins (&gt;25%), near-zero net debt, high return on equity (51.2%), and multi-year AI delivery contracts across European enterprises.
+        </p>
+      </div>
+    </section>
+
+    <!-- PAGE 11: ASK AI -->
+    <section id="page-ask-ai" class="page-section">
+      <div class="hero-header">🤖 Ask FinGuard Multi-Agent Assistant</div>
+      <div class="hero-sub">Autonomous intelligence grounded strictly in your real account telemetry.</div>
+
+      <div class="content-box">
+        <div class="chat-box" id="chat-stream">
+          <div class="chat-msg msg-bot">
+            <strong>🛡️ FinGuard AI:</strong><br />
+            Hello! I am your autonomous financial intelligence partner. Ask me about your spending leaks, 0–100 risk score, stock outlooks, or upcoming purchase affordability!
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap;">
+          <button class="btn btn-secondary" style="font-size: 0.78rem;" onclick="setPrompt('Where am I spending the most money?')">Where am I spending most?</button>
+          <button class="btn btn-secondary" style="font-size: 0.78rem;" onclick="setPrompt('Why is my risk score at 38?')">Why is my risk score 38?</button>
+          <button class="btn btn-secondary" style="font-size: 0.78rem;" onclick="setPrompt('Can I afford an ₹80,000 laptop?')">Can I afford ₹80,000 laptop?</button>
+          <button class="btn btn-secondary" style="font-size: 0.78rem;" onclick="setPrompt('What is the outlook for TCS.NS stock?')">Analyse TCS.NS stock</button>
+        </div>
+
+        <form onsubmit="handleSendChat(event)" style="display: flex; gap: 10px;">
+          <input type="text" id="chat-input" class="input-field" placeholder="Ask any financial question grounded in your telemetry..." required />
+          <button type="submit" class="btn btn-primary" style="min-width: 100px;">Send</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- PAGE 12: BUDGETS & GOALS -->
+    <section id="page-budgets" class="page-section">
+      <div class="hero-header">Monthly Category Budgets & Goals</div>
+      <div class="hero-sub">Set automated spending guardrails and track milestone savings.</div>
+
+      <div class="grid-2">
+        <div class="content-box">
+          <div class="box-title">Monthly Category Budgets</div>
+          <div style="margin-bottom: 16px;">
+            <div style="display: flex; justify-content: space-between; font-size: 0.88rem; margin-bottom: 4px;">
+              <span>Food & Dining</span>
+              <span>₹17,500 / ₹20,000 (87.5%)</span>
+            </div>
+            <div style="height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden;">
+              <div style="width: 87.5%; height: 100%; background: var(--accent-amber);"></div>
+            </div>
+          </div>
+          <div style="margin-bottom: 16px;">
+            <div style="display: flex; justify-content: space-between; font-size: 0.88rem; margin-bottom: 4px;">
+              <span>Shopping & Discretionary</span>
+              <span>₹8,200 / ₹15,000 (54.6%)</span>
+            </div>
+            <div style="height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden;">
+              <div style="width: 54.6%; height: 100%; background: var(--accent-green);"></div>
+            </div>
+          </div>
+          <div style="margin-bottom: 16px;">
+            <div style="display: flex; justify-content: space-between; font-size: 0.88rem; margin-bottom: 4px;">
+              <span>Transport & Commute</span>
+              <span>₹4,800 / ₹6,000 (80.0%)</span>
+            </div>
+            <div style="height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden;">
+              <div style="width: 80%; height: 100%; background: var(--accent-green);"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="content-box">
+          <div class="box-title">Financial Goal Milestones</div>
+          <div style="margin-bottom: 16px;">
+            <div style="display: flex; justify-content: space-between; font-weight: 700; font-size: 0.95rem;">
+              <span>🎯 Emergency Reserve Fund</span>
+              <span style="color: var(--primary);">₹2,81,000 / ₹5,00,000</span>
+            </div>
+            <div style="height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden; margin: 8px 0;">
+              <div style="width: 56.2%; height: 100%; background: var(--primary);"></div>
+            </div>
+            <div style="font-size: 0.8rem; color: var(--text-muted);">Target Date: Dec 2026 (56.2% Complete)</div>
+          </div>
+
+          <div style="margin-bottom: 16px;">
+            <div style="display: flex; justify-content: space-between; font-weight: 700; font-size: 0.95rem;">
+              <span>🎯 International Travel 2027</span>
+              <span style="color: var(--accent-green);">₹95,000 / ₹1,50,000</span>
+            </div>
+            <div style="height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden; margin: 8px 0;">
+              <div style="width: 63.3%; height: 100%; background: var(--accent-green);"></div>
+            </div>
+            <div style="font-size: 0.8rem; color: var(--text-muted);">Target Date: Mar 2027 (63.3% Complete)</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    // Initial State & Demo Telemetry
+    let transactions = [
+      { date: "2026-09-01", type: "Income", category: "Salary", desc: "Monthly Tech Corp Salary", acc: "HDFC Salary A/c", amount: 125000 },
+      { date: "2026-09-03", type: "Expense", category: "Rent", desc: "Apartment Rent", acc: "HDFC Salary A/c", amount: 30000 },
+      { date: "2026-09-05", type: "Expense", category: "Debt", desc: "Auto Loan EMI", acc: "HDFC Salary A/c", amount: 14200 },
+      { date: "2026-09-07", type: "Expense", category: "Investments", desc: "SIP Parag Parikh Flexi Cap", acc: "HDFC Salary A/c", amount: 25000 },
+      { date: "2026-09-08", type: "Expense", category: "Food", desc: "Swiggy Gourmet Delivery", acc: "Regalia Credit Card", amount: 1450 },
+      { date: "2026-09-10", type: "Expense", category: "Bills", desc: "Netflix & Spotify Subscriptions", acc: "Regalia Credit Card", amount: 1299 },
+      { date: "2026-09-12", type: "Expense", category: "Transport", desc: "Uber Commute Rides", acc: "Regalia Credit Card", amount: 1850 },
+      { date: "2026-09-15", type: "Income", category: "Freelance", desc: "AI Consulting Retainer", acc: "HDFC Salary A/c", amount: 28000 },
+      { date: "2026-09-18", type: "Expense", category: "Food", desc: "Weekend Dining - Burma Burma", acc: "Regalia Credit Card", amount: 3800 },
+      { date: "2026-09-20", type: "Expense", category: "Shopping", desc: "Amazon Electronics Purchase", acc: "Regalia Credit Card", amount: 5400 }
+    ];
+
+    // Page Navigation
+    function showPage(pageId, el) {
+      document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      
+      const target = document.getElementById('page-' + pageId);
+      if (target) target.classList.add('active');
+      if (el) el.classList.add('active');
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      
+      // Render charts if newly revealed
+      if (pageId === 'dashboard') initDashboardCharts();
+      if (pageId === 'accounts') initAccountsChart();
+      if (pageId === 'expense-intelligence') initExpenseIntelChart();
+      if (pageId === 'risk-center') initRiskGauge();
+      if (pageId === 'risk-dna') initRadarChart();
+      if (pageId === 'forecasting') initForecastChart();
+      if (pageId === 'stock-ai') loadStock('TCS.NS');
+    }
+
+    // Render Transactions Table
+    function renderTransactions(list = transactions) {
+      const tbody = document.getElementById('tx-table-body');
+      tbody.innerHTML = '';
+      list.slice().reverse().forEach(t => {
+        const isInc = t.type === 'Income';
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${t.date}</td>
+          <td><span class="kpi-badge ${isInc ? 'badge-pos' : 'badge-neg'}">${t.type}</span></td>
+          <td>${t.category}</td>
+          <td>${t.desc}</td>
+          <td style="color: #94A3B8;">${t.acc}</td>
+          <td style="font-weight: 700; color: ${isInc ? 'var(--accent-green)' : '#fff'};">₹${t.amount.toLocaleString()}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function filterTransactions() {
+      const q = document.getElementById('tx-search').value.toLowerCase();
+      const type = document.getElementById('filter-type').value;
+      const cat = document.getElementById('filter-cat').value;
+
+      const filtered = transactions.filter(t => {
+        const matchQ = t.desc.toLowerCase().includes(q) || t.category.toLowerCase().includes(q);
+        const matchType = type === 'All' || t.type === type;
+        const matchCat = cat === 'All' || t.category === cat;
+        return matchQ && matchType && matchCat;
+      });
+      renderTransactions(filtered);
+    }
+
+    // Quick Add Transaction
+    function handleQuickAddTx(e) {
+      e.preventDefault();
+      const date = document.getElementById('tx-date').value;
+      const type = document.getElementById('tx-type').value;
+      const cat = document.getElementById('tx-cat').value;
+      const amt = parseFloat(document.getElementById('tx-amt').value);
+      const desc = document.getElementById('tx-desc').value;
+
+      transactions.push({
+        date: date,
+        type: type,
+        category: cat,
+        desc: desc,
+        acc: "Primary Checking",
+        amount: amt
+      });
+
+      renderTransactions();
+      initDashboardCharts();
+      alert("✅ Transaction recorded! Telemetry & charts updated.");
+    }
+
+    // Export CSV
+    function exportCSV() {
+      let csv = "Date,Type,Category,Description,Account,Amount\n";
+      transactions.forEach(t => {
+        csv += `${t.date},${t.type},${t.category},"${t.desc}",${t.acc},${t.amount}\n`;
+      });
+      const blob = new Blob([csv], { type: "text/csv" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "finguard_transactions.csv";
+      a.click();
+    }
+
+    // Affordability Calculator
+    function calculateAffordability() {
+      const cost = parseFloat(document.getElementById('afford-cost').value) || 0;
+      const reserves = 281000;
+      const monthlyExp = 78200;
+      const postReserves = reserves - cost;
+      const postRunway = (postReserves / monthlyExp).toFixed(1);
+
+      const box = document.getElementById('afford-verdict-box');
+      if (cost <= reserves * 0.35 && postRunway >= 2.5) {
+        box.innerHTML = `
+          <span class="kpi-badge badge-pos" style="font-size: 0.9rem; padding: 6px 14px;">LOW FINANCIAL IMPACT</span>
+          <h3 style="margin: 14px 0 6px 0; color: #fff;">✅ Safe to Proceed</h3>
+          <p style="color: #CBD5E1; font-size: 0.92rem; line-height: 1.5;">
+            Liquid runway drops to <strong>${postRunway} months</strong>. Cash flow and emergency cushion remain solid.
+          </p>
+        `;
+      } else if (postReserves > 0) {
+        box.innerHTML = `
+          <span class="kpi-badge badge-amber" style="font-size: 0.9rem; padding: 6px 14px;">MODERATE IMPACT</span>
+          <h3 style="margin: 14px 0 6px 0; color: var(--accent-amber);">⚠️ Proceed with Caution</h3>
+          <p style="color: #CBD5E1; font-size: 0.92rem; line-height: 1.5;">
+            Post-purchase runway reduces to <strong>${postRunway} months</strong>. Buffer is slightly below the 3.0-month recommended baseline.
+          </p>
+        `;
+      } else {
+        box.innerHTML = `
+          <span class="kpi-badge badge-neg" style="font-size: 0.9rem; padding: 6px 14px;">HIGH FINANCIAL STRESS</span>
+          <h3 style="margin: 14px 0 6px 0; color: var(--accent-red);">❌ Purchase Deficit</h3>
+          <p style="color: #CBD5E1; font-size: 0.92rem; line-height: 1.5;">
+            This outlay exceeds current liquid savings and would deplete emergency reserves.
+          </p>
+        `;
+      }
+    }
+
+    // Stress Test
+    function runStressTest() {
+      const incLoss = parseFloat(document.getElementById('stress-income').value);
+      const lump = parseFloat(document.getElementById('stress-lump').value) || 0;
+      const inf = parseFloat(document.getElementById('stress-inf').value);
+
+      document.getElementById('stress-inc-val').innerText = incLoss + "% Income Loss";
+      document.getElementById('stress-inf-val').innerText = "+" + inf + "% Living Costs";
+
+      const baseInc = 125000 * (1 - incLoss / 100);
+      const baseExp = 78200 * (1 + inf / 100);
+      const deficit = Math.max(baseExp - baseInc, 0);
+
+      const buffer = Math.max(281000 - lump, 0);
+      const survival = deficit > 0 ? (buffer / deficit).toFixed(1) : "99+";
+
+      document.getElementById('stress-deficit').innerText = "₹" + Math.round(deficit).toLocaleString() + "/mo";
+      document.getElementById('stress-post-buffer').innerText = "₹" + Math.round(buffer).toLocaleString();
+      document.getElementById('stress-survival').innerText = survival + " Months";
+    }
+
+    // Stocks Submodule
+    const stocks = {
+      "TCS.NS": { price: 3912.45, change: "+0.70%", rsi: 52.4, pe: 29.8, outlook: "Positive Outlook — Accumulate on Dips", rationale: "Resilient operating margins (>25%), zero net debt, high ROE (51.2%), and consistent AI delivery transformations." },
+      "RELIANCE.NS": { price: 2945.80, change: "+0.54%", rsi: 56.1, pe: 27.4, outlook: "Positive Outlook — Consumer Growth", rationale: "Expanding retail footprint, 5G monetization at Jio, and green energy investments." },
+      "INFY.NS": { price: 1748.60, change: "+0.96%", rsi: 48.9, pe: 26.9, outlook: "Neutral Outlook — Range Bound", rationale: "High dividend yield offset by uneven North American banking client budget releases." },
+      "HDFCBANK.NS": { price: 1642.50, change: "+0.77%", rsi: 44.5, pe: 18.9, outlook: "Positive Outlook — Value Accretion", rationale: "Attractive valuation below historical averages, post-merger deposit accretion." }
+    };
+
+    function loadStock(sym) {
+      const data = stocks[sym] || stocks["TCS.NS"];
+      document.getElementById('stock-ticker-label').innerText = sym + " Price";
+      document.getElementById('stock-price').innerText = "₹" + data.price.toLocaleString();
+      document.getElementById('stock-change').innerText = data.change;
+      document.getElementById('stock-rsi').innerText = data.rsi;
+      document.getElementById('stock-pe').innerText = data.pe;
+      document.getElementById('stock-outlook').innerText = data.outlook;
+      document.getElementById('stock-rationale').innerText = data.rationale;
+
+      // Render Price chart
+      const dates = ["Apr", "May", "Jun", "Jul", "Aug", "Sep"];
+      const prices = [data.price * 0.92, data.price * 0.94, data.price * 0.98, data.price * 0.96, data.price * 0.99, data.price];
+      const sma20 = [data.price * 0.91, data.price * 0.93, data.price * 0.95, data.price * 0.96, data.price * 0.97, data.price * 0.98];
+
+      Plotly.newPlot('chart-stock', [
+        { x: dates, y: prices, type: 'scatter', mode: 'lines+markers', name: sym + ' Close', line: { color: '#00D2FF', width: 2.5 } },
+        { x: dates, y: sma20, type: 'scatter', mode: 'lines', name: '20 SMA', line: { color: '#F59E0B', dash: 'dash', width: 2 } }
+      ], {
+        paper_bgcolor: 'rgba(0,0,0,0)',
+        plot_bgcolor: 'rgba(0,0,0,0)',
+        margin: { t: 20, r: 20, l: 40, b: 30 },
+        font: { color: '#94A3B8' },
+        xaxis: { gridcolor: 'rgba(255,255,255,0.06)' },
+        yaxis: { gridcolor: 'rgba(255,255,255,0.06)' }
+      }, { responsive: true, displayModeBar: false });
+    }
+
+    // AI Chat Bot
+    function setPrompt(txt) {
+      document.getElementById('chat-input').value = txt;
+    }
+
+    function handleSendChat(e) {
+      e.preventDefault();
+      const input = document.getElementById('chat-input');
+      const q = input.value.trim();
+      if (!q) return;
+
+      const chat = document.getElementById('chat-stream');
+      chat.innerHTML += `<div class="chat-msg msg-user"><strong>You:</strong><br />${q}</div>`;
+      input.value = '';
+
+      let reply = "";
+      const ql = q.toLowerCase();
+      if (ql.includes("where") || ql.includes("most") || ql.includes("food")) {
+        reply = "<strong>🔍 Financial Analyst:</strong> Your highest expenditure category is <strong>Food & Dining (₹17,500/month)</strong>, representing 22.4% of total living costs. There is a marked <strong>+34% surge on weekends</strong> driven by Swiggy/Zomato delivery orders.";
+      } else if (ql.includes("risk") || ql.includes("38") || ql.includes("score")) {
+        reply = "<strong>⚠️ Risk Analyst:</strong> Your risk score is <strong>38/100 (Moderate Risk)</strong>. Key strengths: Healthy 37.4% savings rate and DTI ratio under 12%. Primary vulnerability: Revolving credit card balance (₹38,500 at 36% APR). Paying this down will lower your risk score to under 25 (Low Risk).";
+      } else if (ql.includes("afford") || ql.includes("laptop")) {
+        reply = "<strong>💡 Decision Engine:</strong> Evaluating a ₹80,000 laptop against your current net savings: Safe to proceed! Your liquid runway will adjust from 3.6 months to 2.6 months, remaining within manageable emergency parameters.";
+      } else if (ql.includes("stock") || ql.includes("tcs")) {
+        reply = "<strong>📈 Stock Analyst:</strong> TCS.NS is currently trading around ₹3,912 with an RSI of 52.4 (Neutral). Fundamentals remain rock-solid with return on equity above 51% and multi-year AI delivery momentum.";
+      } else {
+        reply = `<strong>🛡️ FinGuard AI:</strong> Grounded analysis based on your telemetry: Inflows are steady at ₹1,25,000/mo and your net monthly surplus is ₹46,800. Directing 30% of this surplus to liquid sweep funds will achieve your 6-month buffer target within 5 months.`;
+      }
+
+      setTimeout(() => {
+        chat.innerHTML += `<div class="chat-msg msg-bot">${reply}</div>`;
+        chat.scrollTop = chat.scrollHeight;
+      }, 350);
+    }
+
+    // Chart Initializations
+    function initDashboardCharts() {
+      Plotly.newPlot('chart-cashflow', [
+        { x: ['Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep'], y: [125000, 153000, 125000, 125000, 140000, 153000], type: 'bar', name: 'Income', marker: { color: '#10B981' } },
+        { x: ['Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep'], y: [74000, 82000, 71000, 79000, 76000, 78200], type: 'bar', name: 'Expenses', marker: { color: '#EF4444' } }
+      ], {
+        paper_bgcolor: 'rgba(0,0,0,0)',
+        plot_bgcolor: 'rgba(0,0,0,0)',
+        margin: { t: 20, r: 20, l: 50, b: 30 },
+        font: { color: '#94A3B8' },
+        barmode: 'group',
+        xaxis: { gridcolor: 'rgba(255,255,255,0.06)' },
+        yaxis: { gridcolor: 'rgba(255,255,255,0.06)' },
+        legend: { orientation: 'h', y: 1.1 }
+      }, { responsive: true, displayModeBar: false });
+
+      Plotly.newPlot('chart-category', [{
+        values: [30000, 17500, 14200, 8200, 4800, 3500],
+        labels: ['Rent', 'Food & Dining', 'Auto Loan EMI', 'Shopping', 'Transport', 'Utilities'],
+        type: 'pie',
+        hole: 0.55,
+        marker: { colors: ['#00D2FF', '#7000FF', '#EF4444', '#F59E0B', '#10B981', '#64748B'] }
+      }], {
+        paper_bgcolor: 'rgba(0,0,0,0)',
+        margin: { t: 10, r: 10, l: 10, b: 10 },
+        font: { color: '#CBD5E1' },
+        showlegend: false
+      }, { responsive: true, displayModeBar: false });
+    }
+
+    function initAccountsChart() {
+      Plotly.newPlot('chart-accounts', [{
+        x: ['HDFC Salary A/c', 'Emergency FD', 'Regalia Credit Card'],
+        y: [342500, 281000, -38500],
+        type: 'bar',
+        marker: { color: ['#10B981', '#00D2FF', '#EF4444'] }
+      }], {
+        paper_bgcolor: 'rgba(0,0,0,0)',
+        plot_bgcolor: 'rgba(0,0,0,0)',
+        margin: { t: 20, r: 20, l: 50, b: 30 },
+        font: { color: '#94A3B8' },
+        yaxis: { gridcolor: 'rgba(255,255,255,0.06)' }
+      }, { responsive: true, displayModeBar: false });
+    }
+
+    function initExpenseIntelChart() {
+      Plotly.newPlot('chart-expense-intel', [
+        { x: ['W1', 'W2', 'W3', 'W4', 'W5', 'W6', 'W7', 'W8'], y: [18400, 19200, 17100, 22400, 16900, 18200, 21500, 19800], type: 'scatter', mode: 'lines+markers', name: 'Weekly Burn', line: { color: '#EF4444', width: 2 } },
+        { x: ['W1', 'W2', 'W3', 'W4', 'W5', 'W6', 'W7', 'W8'], y: [18000, 18500, 18200, 19100, 18800, 18600, 19200, 19100], type: 'scatter', mode: 'lines', name: 'Trend Baseline', line: { color: '#00D2FF', dash: 'dash', width: 2 } }
+      ], {
+        paper_bgcolor: 'rgba(0,0,0,0)',
+        plot_bgcolor: 'rgba(0,0,0,0)',
+        margin: { t: 20, r: 20, l: 50, b: 30 },
+        font: { color: '#94A3B8' },
+        xaxis: { gridcolor: 'rgba(255,255,255,0.06)' },
+        yaxis: { gridcolor: 'rgba(255,255,255,0.06)' }
+      }, { responsive: true, displayModeBar: false });
+    }
+
+    function initRiskGauge() {
+      Plotly.newPlot('chart-risk-gauge', [{
+        type: "indicator",
+        mode: "gauge+number",
+        value: 38,
+        title: { text: "Risk Index", font: { size: 16, color: "#fff" } },
+        gauge: {
+          axis: { range: [0, 100], tickcolor: "#94A3B8" },
+          bar: { color: "#F59E0B" },
+          bgcolor: "rgba(255,255,255,0.05)",
+          steps: [
+            { range: [0, 30], color: "rgba(16, 185, 129, 0.2)" },
+            { range: [30, 60], color: "rgba(245, 158, 11, 0.2)" },
+            { range: [60, 100], color: "rgba(239, 68, 68, 0.2)" }
+          ]
+        }
+      }], {
+        paper_bgcolor: 'rgba(0,0,0,0)',
+        margin: { t: 10, r: 20, l: 20, b: 10 },
+        font: { color: '#fff' }
+      }, { responsive: true, displayModeBar: false });
+    }
+
+    function initRadarChart() {
+      Plotly.newPlot('chart-radar', [{
+        type: 'scatterpolar',
+        r: [88, 68, 72, 75, 60, 80, 88],
+        theta: ['Savings Discipline', 'Debt Restraint', 'Emergency Cushion', 'Spending Stability', 'Investment Appetite', 'Income Predictability', 'Savings Discipline'],
+        fill: 'toself',
+        fillcolor: 'rgba(0, 210, 255, 0.25)',
+        line: { color: '#00D2FF', width: 2 }
+      }], {
+        polar: {
+          radialaxis: { visible: true, range: [0, 100], color: "#94A3B8", gridcolor: "rgba(255,255,255,0.08)" },
+          angularaxis: { color: "#fff", gridcolor: "rgba(255,255,255,0.08)" }
+        },
+        paper_bgcolor: 'rgba(0,0,0,0)',
+        margin: { t: 30, r: 30, l: 30, b: 30 }
+      }, { responsive: true, displayModeBar: false });
+    }
+
+    function initForecastChart() {
+      const histD = ["Day 1", "Day 10", "Day 20", "Day 30", "Day 40", "Day 50"];
+      const histY = [2400, 2100, 3100, 2600, 2800, 2550];
+      const projD = ["Day 50", "Day 60", "Day 70", "Day 80", "Day 90", "Day 100", "Day 110"];
+      const projY = [2550, 2620, 2690, 2750, 2810, 2880, 2940];
+
+      Plotly.newPlot('chart-forecast', [
+        { x: histD, y: histY, type: 'scatter', mode: 'lines+markers', name: 'Historical Daily Outflow', line: { color: '#38BDF8', width: 2 } },
+        { x: projD, y: projY, type: 'scatter', mode: 'lines', name: '60-Day Linear Projection', line: { color: '#F59E0B', dash: 'dash', width: 2.5 } }
+      ], {
+        paper_bgcolor: 'rgba(0,0,0,0)',
+        plot_bgcolor: 'rgba(0,0,0,0)',
+        margin: { t: 20, r: 20, l: 50, b: 30 },
+        font: { color: '#94A3B8' },
+        xaxis: { gridcolor: 'rgba(255,255,255,0.06)' },
+        yaxis: { gridcolor: 'rgba(255,255,255,0.06)' }
+      }, { responsive: true, displayModeBar: false });
+    }
+
+    // Window Init
+    window.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('tx-date').value = new Date().toISOString().split('T')[0];
+      renderTransactions();
+      initDashboardCharts();
+    });
+  </script>
+</body>
+</html>
