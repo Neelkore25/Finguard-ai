@@ -1,0 +1,13 @@
+Date,Type,Category,Amount,Description,Account
+2024-05-01,Income,Salary,125000,Monthly Tech Salary,HDFC Salary
+2024-05-03,Expense,Rent,30000,Apartment Rent,HDFC Salary
+2024-05-05,Expense,Debt,14200,Car Loan EMI,HDFC Salary
+2024-05-07,Expense,Investments,25000,SIP Parag Parikh Flexi Cap,HDFC Salary
+2024-05-08,Expense,Food,1450,Swiggy Gourmet Order,Credit Card
+2024-05-10,Expense,Entertainment,649,Netflix Subscription,Credit Card
+2024-05-12,Expense,Transport,1800,Uber Commute,Credit Card
+2024-05-15,Income,Freelance,28000,AI Prototype Consulting,HDFC Salary
+2024-05-18,Expense,Bills,2450,BESCOM Electricity,HDFC Salary
+2024-05-22,Expense,Food,850,Blue Tokai Coffee,Credit Card
+2024-05-25,Expense,Shopping,5200,Amazon Shopping,Credit Card
+2024-05-28,Expense,Healthcare,2500,Cult.fit Membership,Credit Card
